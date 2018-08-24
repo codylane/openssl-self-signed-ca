@@ -1,0 +1,17 @@
+## files
+self-signed-ca-override.conf
+*.crt
+*.csr
+*.pem
+*.key
+*.srl
+serial*
+ca.conf
+index*
+
+## directories
+newcerts/*
+private/*
+ca/*
+crl/*
+certs/*

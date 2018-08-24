@@ -1,0 +1,15 @@
+---
+
+sudo: true
+services:
+  - docker
+
+matrix:
+  fast_finish: true
+  include:
+    - os: linux
+      dist: trusty
+      sudo: required
+
+script:
+  - .ci/test.sh
