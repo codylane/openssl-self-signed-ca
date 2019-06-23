@@ -104,7 +104,6 @@ database = ${SSL_KEY_DIR}/index.txt
 
 # specifies the directory where new certificates will be placed. Mandatory.
 new_certs_dir = ${SSL_KEY_DIR}/newcerts
-
 # the file containing the CA certificate. Mandatory
 certificate = ${SSL_KEY_DIR}/${SSL_ROOT_CA_KEY}.pem
 
@@ -185,6 +184,7 @@ organizationalUnitName_default  = ${SSL_KEY_ORG_UNIT}
 
 commonName                      = Common Name (eg, your name or your server\'s hostname)
 commonName_max                  = 64
+# commonName_default              = ${SSL_ROOT_CA_CN}
 
 emailAddress                    = Email Address
 emailAddress_max                = 64
@@ -342,12 +342,21 @@ DNS.1 = *.${WILDCARD_DOMAIN}
 DNS.2 = ${SSL_KEY_CN}
 EOF
 
+COUNTER=3
+for alt_name in ${SSL_DNS_ALT_NAMES}
+do
+  echo "DNS.${COUNTER} = ${alt_name}" >> ca.conf
+  COUNTER=$((COUNTER + 1))
+done
+
 return $?
 
 }
 
 create-root-ca-key() {
   local _rc=0
+
+  create-ca-conf
 
   if [ -z "${SSL_ROOT_CA_PASSPHRASE}" ]; then
     # generate ca key without a password
@@ -370,6 +379,8 @@ create-root-ca-key() {
 
 create-root-ca-pem() {
 
+  create-ca-conf
+
   if [ -z "${SSL_ROOT_CA_PASSPHRASE}" ]; then
     openssl req \
       -config ${SSL_KEY_DIR}/ca.conf \
@@ -379,7 +390,7 @@ create-root-ca-pem() {
       -nodes \
       -key ${SSL_KEY_DIR}/${SSL_ROOT_CA_KEY}.key \
       -${SSL_KEY_TYPE} \
-      -days ${SSL_KEY_EXPIRE_AFTER_DAYS} \
+      -days ${SSL_ROOT_CA_KEY_EXPIRE_AFTER_DAYS} \
       -out ${SSL_KEY_DIR}/${SSL_ROOT_CA_KEY}.pem
 
     return $?
@@ -407,6 +418,8 @@ create-root-ca-pem() {
 create-csr() {
   local _rc=0
 
+  create-ca-conf
+
   echo "Generating new key for CSR ..."
   openssl genrsa \
       -out ${SSL_KEY_DIR}/${SSL_KEY_NAME}.key \
@@ -432,6 +445,8 @@ create-csr() {
 sign-csr-drop-extensions() {
   local _rc=0
 
+  create-ca-conf
+
   openssl x509 \
     -req \
     -in ${SSL_KEY_DIR}/${SSL_KEY_NAME}.csr \
@@ -451,6 +466,8 @@ sign-csr-drop-extensions() {
 
 sign-csr-keep-extensions() {
   local _rc=0
+
+  create-ca-conf
 
   openssl ca \
     -config ${SSL_KEY_DIR}/ca.conf \

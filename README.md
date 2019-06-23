@@ -121,12 +121,24 @@ Certificate:
          9e:b0:4c:33
 ```
 
-Generating a CSR
---------------------------------
+Generating a CSR with a custom CN
+---------------------------------
+
+```
+SSL_KEY_CN=foo-server-01.example.com ./myca.sh create-csr
+
+
+```
+
+Generating a CSR using whatever is in our configs
+-------------------------------------------------
 
 ```
 ./myca.sh create-csr
+
+
 ```
+
 
 Validate the CSR
 -----------------------
