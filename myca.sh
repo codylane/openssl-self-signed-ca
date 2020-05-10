@@ -48,6 +48,9 @@ err() {
 
 clean() {
 
+  mkdir -p backups/
+  mv ROOT-CA* backups/
+
   rm -f "${SSL_KEY_DIR}/${SSL_ROOT_CA_KEY}.pem"
   rm -f "${SSL_KEY_DIR}/${SSL_ROOT_CA_KEY}.key"
   rm -f "${SSL_KEY_DIR}/${SSL_ROOT_CA_KEY}.srl"
@@ -74,7 +77,7 @@ clean() {
 create-ca-conf() {
 
   [ -f ${SSL_KEY_DIR}/index.txt ] || touch ${SSL_KEY_DIR}/index.txt
-  [ -f ${SSL_KEY_DIR}/serial ] || echo '01' > ${SSL_KEY_DIR}/serial
+  [ -f ${SSL_KEY_DIR}/serial ] || echo "$(openssl rand -hex 16)" > ${SSL_KEY_DIR}/serial
 
   mkdir -p ${SSL_KEY_DIR}/newcerts
   mkdir -p ${SSL_KEY_DIR}/ca
