@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.org/codylane/openssl-self-signed-ca.svg?branch=master)](https://travis-ci.org/codylane/openssl-self-signed-ca)
-
 How to use Openssl to be a self signed CA
 -----------------------------------------
 
